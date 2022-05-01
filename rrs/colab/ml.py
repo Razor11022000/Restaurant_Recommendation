@@ -1,13 +1,15 @@
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import warnings
+warnings.filterwarnings("ignore")
 
 #plotting
 import matplotlib.pyplot as plt
 import seaborn as sns 
 
 # import the data (chunksize returns jsonReader for iteration)
-businesses = pd.read_json("/Users/mithun-g/Downloads/yelp_dataset/yelp_academic_dataset_business.json", lines=True, orient='columns', chunksize=1000000)
-reviews = pd.read_json("/Users/mithun-g/Downloads/yelp_dataset/yelp_academic_dataset_review.json", lines=True, orient='columns', chunksize=1000000)
+businesses = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_business.json", lines=True, orient='columns', chunksize=1000000)
+reviews = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_review.json", lines=True, orient='columns', chunksize=1000000)
 
 # read the data 
 for business in businesses:
@@ -294,8 +296,6 @@ max_rating = max(combined_business_data_keras['stars'])
 
 print(n_users, n_rests, min_rating, max_rating)
 
-combined_business_data_keras
-
 from sklearn.model_selection import train_test_split
 
 X = combined_business_data_keras[['user', 'business']].values
@@ -357,13 +357,13 @@ keras_model.summary()
 keras_model.fit(x=X_train_array, y=y_train_keras, batch_size=64,\
                           epochs=5, verbose=1, validation_data=(X_test_array, y_test_keras))
 
-keras_model.save("/content/drive/MyDrive/model/rss_model")
+keras_model.save("./model/rss_model")
 
 # prediction
 # predictions = keras_model.predict(X_test_array)
 
 import keras.models as keras_model
-reconstructed_model = keras_model.load_model("/content/drive/MyDrive/model/rss_model")
+reconstructed_model = keras_model.load_model("./model/rss_model")
 predictions = reconstructed_model.predict(X_test_array)
 
 # create the df_test table with prediction results
@@ -412,11 +412,11 @@ print("The shape of embedded weights: ", emb_weights.shape)
 print("The length of embedded weights: ", len(emb_weights))
 
 # Extract embeddings
-emb = keras_model.get_layer('embedding_2')
-emb_weights = emb.get_weights()[0]
+# emb = keras_model.get_layer('embedding_2')
+# emb_weights = emb.get_weights()[0]
 
-print("The shape of embedded weights: ", emb_weights.shape)
-print("The length of embedded weights: ", len(emb_weights))
+# print("The shape of embedded weights: ", emb_weights.shape)
+# print("The length of embedded weights: ", len(emb_weights))
 
 # normalize and reshape embedded weights
 emb_weights = emb_weights / np.linalg.norm(emb_weights, axis = 1).reshape((-1, 1))
