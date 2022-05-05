@@ -1,26 +1,30 @@
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import ast
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 import warnings
 warnings.filterwarnings("ignore")
 
-#plotting
-import matplotlib.pyplot as plt
-import seaborn as sns
+# plotting
+
 
 def readData():
     # import the data (chunksize returns jsonReader for iteration)
-    businesses = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_business.json", lines=True, orient='columns', chunksize=1000000)
-    reviews = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_review.json", lines=True, orient='columns', chunksize=1000000)
+    businesses = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_business.json",
+                              lines=True, orient='columns', chunksize=1000000)
+    reviews = pd.read_json("C:\\Users\\Midhun\\Downloads\\yelp_academic_dataset_review.json",
+                           lines=True, orient='columns', chunksize=1000000)
 
-    # read the data 
+    # read the data
     for business in businesses:
         subset_business = business
         break
-        
+
     for review in reviews:
         subset_review = review
         break
-    
+
     return subset_business, subset_review
 
 
@@ -31,34 +35,39 @@ def plotCityRatings(subset_business):
 
     # City with most reviews
     color = sns.color_palette()
-    #Get the distribution of the ratings
-    x=subset_business['city'].value_counts()
-    x=x.sort_values(ascending=False)
-    x=x.iloc[0:20]
-    plt.figure(figsize=(16,4))
-    ax = sns.barplot(x.index, x.values, alpha=0.8,color=color[3])
+    # Get the distribution of the ratings
+    x = subset_business['city'].value_counts()
+    x = x.sort_values(ascending=False)
+    x = x.iloc[0:20]
+    plt.figure(figsize=(16, 4))
+    ax = sns.barplot(x.index, x.values, alpha=0.8, color=color[3])
     plt.title("Which city has the most reviews?")
     locs, labels = plt.xticks()
     plt.setp(labels, rotation=45)
     plt.ylabel('# businesses', fontsize=12)
     plt.xlabel('City', fontsize=12)
 
-    #adding the text labels
+    # adding the text labels
     rects = ax.patches
     labels = x.values
     for rect, label in zip(rects, labels):
         height = rect.get_height()
-        ax.text(rect.get_x() + rect.get_width()/2, height + 5, label, ha='center', va='bottom')
+        ax.text(rect.get_x() + rect.get_width()/2,
+                height + 5, label, ha='center', va='bottom')
 
     plt.show()
 
+
 def selectRestaurantsInCity(subset_business, city):
     # Businesses in Philadelphia and currently open business
-    city = subset_business[(subset_business['city'] == city) & (subset_business['is_open'] == 1)]
-    philadelphia = city[['business_id','name','address', 'categories', 'attributes','stars']]
+    city = subset_business[(subset_business['city'] == city) & (
+        subset_business['is_open'] == 1)]
+    philadelphia = city[['business_id', 'name',
+                         'address', 'categories', 'attributes', 'stars']]
     # print(city.shape)
     # print(philadelphia.shape)
     return philadelphia
+
 
 def plotFamousBusinessInCity(philadelphia):
     business_cats = ""
@@ -66,34 +75,37 @@ def plotFamousBusinessInCity(philadelphia):
         if category != None:
             business_cats += ", " + category
 
-    cats=pd.DataFrame(business_cats.split(','),columns=['category'])
-    x=cats.category.value_counts()
+    cats = pd.DataFrame(business_cats.split(','), columns=['category'])
+    x = cats.category.value_counts()
     # print("There are ",len(x)," different types/categories of Businesses in Yelp!")
-    #prep for chart
-    x=x.sort_values(ascending=False)
-    x=x.iloc[0:20]
+    # prep for chart
+    x = x.sort_values(ascending=False)
+    x = x.iloc[0:20]
 
-    #chart
-    plt.figure(figsize=(16,4))
-    ax = sns.barplot(x.index, x.values, alpha=0.8)#,color=color[5])
-    plt.title("What are the top categories?",fontsize=25)
+    # chart
+    plt.figure(figsize=(16, 4))
+    ax = sns.barplot(x.index, x.values, alpha=0.8)  # ,color=color[5])
+    plt.title("What are the top categories?", fontsize=25)
     locs, labels = plt.xticks()
     plt.setp(labels, rotation=80)
     plt.ylabel('# businesses', fontsize=12)
     plt.xlabel('Category', fontsize=12)
 
-    #adding the text labels
+    # adding the text labels
     rects = ax.patches
     labels = x.values
     for rect, label in zip(rects, labels):
         height = rect.get_height()
-        ax.text(rect.get_x() + rect.get_width()/2, height + 5, label, ha='center', va='bottom')
+        ax.text(rect.get_x() + rect.get_width()/2,
+                height + 5, label, ha='center', va='bottom')
 
     plt.show()
 
+
 def getRestaurantsFromCity(philadelphia):
     # getting just restaurants from Philadelphia business
-    rest = philadelphia[philadelphia['categories'].str.contains('Restaurant.*')==True].reset_index()
+    rest = philadelphia[philadelphia['categories'].str.contains(
+        'Restaurant.*') == True].reset_index()
     # print(rest.shape)
     return rest
 
@@ -105,32 +117,40 @@ def extract_keys(attr, key):
     if key in attr:
         return attr.pop(key)
 
+
 # convert string to dictionary
-import ast
+
+
 def str_to_dict(attr):
     if attr != None:
         return ast.literal_eval(attr)
     else:
-        return ast.literal_eval("{}")    
+        return ast.literal_eval("{}")
 
 
 def getAttrFromNestedAttrs(rest):
     # get dummies from nested attributes
     # list(rest['attributes'])
-    rest['BusinessParking'] = rest.apply(lambda x: str_to_dict(extract_keys(x['attributes'], 'BusinessParking')), axis=1)
-    rest['Ambience'] = rest.apply(lambda x: str_to_dict(extract_keys(x['attributes'], 'Ambience')), axis=1)
-    rest['GoodForMeal'] = rest.apply(lambda x: str_to_dict(extract_keys(x['attributes'], 'GoodForMeal')), axis=1)
-    rest['Dietary'] = rest.apply(lambda x: str_to_dict(extract_keys(x['attributes'], 'Dietary')), axis=1)
-    rest['Music'] = rest.apply(lambda x: str_to_dict(extract_keys(x['attributes'], 'Music')), axis=1)
+    rest['BusinessParking'] = rest.apply(lambda x: str_to_dict(
+        extract_keys(x['attributes'], 'BusinessParking')), axis=1)
+    rest['Ambience'] = rest.apply(lambda x: str_to_dict(
+        extract_keys(x['attributes'], 'Ambience')), axis=1)
+    rest['GoodForMeal'] = rest.apply(lambda x: str_to_dict(
+        extract_keys(x['attributes'], 'GoodForMeal')), axis=1)
+    rest['Dietary'] = rest.apply(lambda x: str_to_dict(
+        extract_keys(x['attributes'], 'Dietary')), axis=1)
+    rest['Music'] = rest.apply(lambda x: str_to_dict(
+        extract_keys(x['attributes'], 'Music')), axis=1)
 
     return rest
 
 
 def createAttrsTable(rest):
     # create table with attribute dummies
-    df_attr = pd.concat([ rest['attributes'].apply(pd.Series), rest['BusinessParking'].apply(pd.Series),
-                        rest['Ambience'].apply(pd.Series), rest['GoodForMeal'].apply(pd.Series), 
-                        rest['Dietary'].apply(pd.Series) ], axis=1)
+    df_attr = pd.concat([rest['attributes'].apply(pd.Series), rest['BusinessParking'].apply(pd.Series),
+                        rest['Ambience'].apply(
+                            pd.Series), rest['GoodForMeal'].apply(pd.Series),
+                        rest['Dietary'].apply(pd.Series)], axis=1)
     df_attr_dummies = pd.get_dummies(df_attr)
     print()
     return df_attr_dummies
@@ -140,20 +160,23 @@ def produceFinalDataFrame(rest, df_attr_dummies):
     # get dummies from categories
     df_categories_dummies = pd.Series(rest['categories']).str.get_dummies(',')
 
-    # pull out names and stars from rest table 
-    result = rest[['name','stars']]
+    # pull out names and stars from rest table
+    result = rest[['name', 'stars']]
 
     # Concat all tables and drop Restaurant column
-    df_final = pd.concat([df_attr_dummies, df_categories_dummies, result], axis=1)
-    df_final.drop('Restaurants',inplace=True,axis=1)
+    df_final = pd.concat(
+        [df_attr_dummies, df_categories_dummies, result], axis=1)
+    df_final.drop('Restaurants', inplace=True, axis=1)
 
     # map floating point stars to an integer
-    mapper = {1.0:1,1.5:2, 2.0:2, 2.5:3, 3.0:3, 3.5:4, 4.0:4, 4.5:5, 5.0:5}
+    mapper = {1.0: 1, 1.5: 2, 2.0: 2, 2.5: 3,
+              3.0: 3, 3.5: 4, 4.0: 4, 4.5: 5, 5.0: 5}
     df_final['stars'] = df_final['stars'].map(mapper)
 
     print("\n ############### Final Dataframe ###############")
     print(df_final.head())
     return df_final
+
 
 def dataPreprocessing():
     subset_business, subset_review = readData()
@@ -172,14 +195,15 @@ def dataPreprocessing():
 
 def knnClassifer(df_final):
     # Create X (all the features) and y (target)
-    X = df_final.iloc[:,:-2]
+    X = df_final.iloc[:, :-2]
     y = df_final['stars']
     # print(X.shape)
     # print(y.shape)
 
     # Split the data into train and test sets
     from sklearn.model_selection import train_test_split
-    X_train_knn, X_test_knn, y_train_knn, y_test_knn = train_test_split(X, y, test_size=0.2, random_state=1)
+    X_train_knn, X_test_knn, y_train_knn, y_test_knn = train_test_split(
+        X, y, test_size=0.2, random_state=1)
 
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.metrics import accuracy_score
@@ -197,12 +221,12 @@ def knnClassifer(df_final):
 
 
 def validateRes(res, df_final):
-  validate_res = df_final[df_final["name"] == res]
-  if len(validate_res) == 0:
-    print("Enter valid res name")
-    return
-  else:
-    return validate_res
+    validate_res = df_final[df_final["name"] == res]
+    if len(validate_res) == 0:
+        print("Enter valid res name")
+        return
+    else:
+        return validate_res
 
 
 ############# 1) Content Based Filtering - Model ##############
@@ -223,10 +247,10 @@ def contentBasedFiltering(df_final):
     # # validation set from the df_final table (exclude the last row)
     # X_val =  df_final.iloc[:-1,:-2]
     # y_val = df_final['stars'].iloc[:-1]
-    
+
     ########### Enter restaurant name here ############
     res_name = "Craft Hall"
-    test_set= validateRes(res_name, df_final).iloc[:,:-2]
+    test_set = validateRes(res_name, df_final).iloc[:, :-2]
     # print(test_set.shape)
     test_sample = df_final
     # print(test_sample.shape)
@@ -236,7 +260,7 @@ def contentBasedFiltering(df_final):
     y_val = test_sample['stars']
     # print(y_val.shape)
 
-    X_val =  test_sample.iloc[:,:-2]
+    X_val = test_sample.iloc[:, :-2]
     # print(X_val.shape)
 
     print(test_set.shape)
@@ -247,22 +271,23 @@ def contentBasedFiltering(df_final):
     n_knn = knn.fit(X_val, y_val)
 
     # distances and indeces from validation set
-    distances, indeces =  n_knn.kneighbors(test_set)
-    #n_knn.kneighbors(test_set)[1][0]
+    distances, indeces = n_knn.kneighbors(test_set)
+    # n_knn.kneighbors(test_set)[1][0]
 
     # create table distances and indeces from validattion restaurant
-    final_table = pd.DataFrame(n_knn.kneighbors(test_set)[0][0], columns = ['distance'])
+    final_table = pd.DataFrame(n_knn.kneighbors(test_set)[
+                               0][0], columns=['distance'])
     final_table['index'] = n_knn.kneighbors(test_set)[1][0]
     final_table.set_index('index')
 
     # get names of the restaurant that similar to the validattion restaurant
-    result = final_table.join(df_final,on='index')
-    print(result[['distance','index','name','stars']].head(5))
+    result = final_table.join(df_final, on='index')
+    print(result[['distance', 'index', 'name', 'stars']].head(5))
 
 
 ############### 2) Collaboritive Filtering - Model ##################
 def collaborititveFiltering(subset_review, rest):
-    # Imports 
+    # Imports
     import sklearn
     from sklearn.decomposition import TruncatedSVD
     from sklearn.metrics import accuracy_score
@@ -272,7 +297,7 @@ def collaborititveFiltering(subset_review, rest):
     # subset_review.columns
 
     # pull out needed columns from subset_review table
-    df_review = subset_review[['user_id','business_id','stars', 'date']]
+    df_review = subset_review[['user_id', 'business_id', 'stars', 'date']]
     # df_review
 
     # pull out names and addresses of the restaurants from rest table
@@ -285,7 +310,8 @@ def collaborititveFiltering(subset_review, rest):
 
     # the most POPULAR restaurants by stars.
     pp("Most popular restaurants by stars")
-    print(combined_business_data.groupby('business_id')['stars'].count().sort_values(ascending=False).head())
+    print(combined_business_data.groupby('business_id')[
+          'stars'].count().sort_values(ascending=False).head())
 
     # see the NAME of the most popular restaurant
     # Filter = combined_business_data['business_id'] == 'EtKSTHV5Qx_Q7Aur9o4kQQ'
@@ -293,11 +319,12 @@ def collaborititveFiltering(subset_review, rest):
     # print("Address:", combined_business_data[Filter]['address'].unique())
 
     # create a user-item matrix
-    rating_crosstab = combined_business_data.pivot_table(values='stars', index='user_id', columns='name', fill_value=0)
+    rating_crosstab = combined_business_data.pivot_table(
+        values='stars', index='user_id', columns='name', fill_value=0)
     pp("Rating Crosstab head")
     print(rating_crosstab.head())
 
-    # shape of the Utility matrix (original matrix) 
+    # shape of the Utility matrix (original matrix)
     pp("Rating Crosstab shape")
     print(rating_crosstab.shape)
 
@@ -308,11 +335,11 @@ def collaborititveFiltering(subset_review, rest):
 
     SVD = TruncatedSVD(n_components=12, random_state=17)
     result_matrix = SVD.fit_transform(X)
-    
+
     pp("Result Matrix")
     print(result_matrix.shape)
 
-    # PearsonR coef 
+    # PearsonR coef
     corr_matrix = np.corrcoef(result_matrix)
     pp("Correlation Matix shape")
     print(corr_matrix.shape)
@@ -326,232 +353,247 @@ def collaborititveFiltering(subset_review, rest):
     # popular_res_name = combined_business_data[Filter]['name'].unique()
     popular_res_name = "Village Whiskey"
     popular_rest = restaurants_list.index(popular_res_name)
-    print("index of the popular restaurant: ", popular_rest) 
+    print("index of the popular restaurant: ", popular_rest)
 
-    # restaurant of interest 
+    # restaurant of interest
     corr_popular_rest = corr_matrix[popular_rest]
     pp("Correlation popular matix shape")
     print(corr_popular_rest.shape)
 
-    print(restaurant_names[(corr_popular_rest < 1.0) & (corr_popular_rest > 0.9)])
+    print(restaurant_names[(corr_popular_rest < 1.0)
+          & (corr_popular_rest > 0.9)])
+    return combined_business_data
 
 
 def run():
     rest, subset_review, df_final = dataPreprocessing()
     # contentBasedFiltering(df_final)
-    collaborititveFiltering(subset_review, rest)
-    
+    combined_business_data = collaborititveFiltering(subset_review, rest)
+    kerasModel(rest, combined_business_data)
+
+
 run()
 
 
-# print(rest[rest['name'] == 'Village Whiskey'])
+def kerasModel(rest, combined_business_data):
+    print(rest[rest['name'] == 'Village Whiskey'])
 
-# # create the copy of combined_business_data table
-# combined_business_data_keras = combined_business_data.copy()
-# print(combined_business_data_keras.head(1))
+    # create the copy of combined_business_data table
+    combined_business_data_keras = combined_business_data.copy()
+    print(combined_business_data_keras.head(1))
 
-# from sklearn.preprocessing import LabelEncoder
+    from sklearn.preprocessing import LabelEncoder
 
-# user_encode = LabelEncoder()
+    user_encode = LabelEncoder()
 
-# combined_business_data_keras['user'] = user_encode.fit_transform(combined_business_data_keras['user_id'].values)
-# n_users = combined_business_data_keras['user'].nunique()
+    combined_business_data_keras['user'] = user_encode.fit_transform(
+        combined_business_data_keras['user_id'].values)
+    n_users = combined_business_data_keras['user'].nunique()
 
-# item_encode = LabelEncoder()
+    item_encode = LabelEncoder()
 
-# combined_business_data_keras['business'] = item_encode.fit_transform(combined_business_data_keras['business_id'].values)
-# n_rests = combined_business_data_keras['business'].nunique()
+    combined_business_data_keras['business'] = item_encode.fit_transform(
+        combined_business_data_keras['business_id'].values)
+    n_rests = combined_business_data_keras['business'].nunique()
 
-# combined_business_data_keras['stars'] = combined_business_data_keras['stars'].values#.astype(np.float32)
+    # .astype(np.float32)
+    combined_business_data_keras['stars'] = combined_business_data_keras['stars'].values
 
-# min_rating = min(combined_business_data_keras['stars'])
-# max_rating = max(combined_business_data_keras['stars'])
+    min_rating = min(combined_business_data_keras['stars'])
+    max_rating = max(combined_business_data_keras['stars'])
 
-# print(n_users, n_rests, min_rating, max_rating)
+    print(n_users, n_rests, min_rating, max_rating)
 
-# from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import train_test_split
 
-# X = combined_business_data_keras[['user', 'business']].values
-# y = combined_business_data_keras['stars'].values
+    X = combined_business_data_keras[['user', 'business']].values
+    y = combined_business_data_keras['stars'].values
 
-# X_train_keras, X_test_keras, y_train_keras, y_test_keras = train_test_split(X, y, test_size=0.2, random_state=42)
-# X_train_keras.shape, X_test_keras.shape, y_train_keras.shape, y_test_keras.shape
+    X_train_keras, X_test_keras, y_train_keras, y_test_keras = train_test_split(
+        X, y, test_size=0.2, random_state=42)
+    X_train_keras.shape, X_test_keras.shape, y_train_keras.shape, y_test_keras.shape
 
-# X_train_keras[:, 0]
+    X_train_keras[:, 0]
 
-# n_factors = 50
+    n_factors = 50
 
-# X_train_array = [X_train_keras[:, 0], X_train_keras[:, 1]]
-# X_test_array = [X_test_keras[:, 0], X_test_keras[:, 1]]
+    X_train_array = [X_train_keras[:, 0], X_train_keras[:, 1]]
+    X_test_array = [X_test_keras[:, 0], X_test_keras[:, 1]]
 
-# X_train_array, X_test_array
+    X_train_array, X_test_array
 
-# from keras.layers import Add, Activation, Lambda
-# from keras.models import Model
-# from keras.layers import Input, Reshape, Dot
-# from keras.layers.embeddings import Embedding
-# from keras.optimizers import adam_v2
-# from keras.regularizers import l2
+    from keras.layers import Add, Activation, Lambda
+    from keras.models import Model
+    from keras.layers import Input, Reshape, Dot
+    from keras.layers.embeddings import Embedding
+    from keras.optimizers import adam_v2
+    from keras.regularizers import l2
 
-# class EmbeddingLayer:
-#     def __init__(self, n_items, n_factors):
-#         self.n_items = n_items
-#         self.n_factors = n_factors
-    
-#     def __call__(self, x):
-#         x = Embedding(self.n_items, self.n_factors, embeddings_initializer='he_normal', embeddings_regularizer=l2(1e-6))(x)
-#         x = Reshape((self.n_factors,))(x)
-        
-#         return x
-    
-# def Recommender(n_users, n_rests, n_factors, min_rating, max_rating):
-#     user = Input(shape=(1,))
-#     u = EmbeddingLayer(n_users, n_factors)(user)
-#     ub = EmbeddingLayer(n_users, 1)(user)
-    
-#     restaurant = Input(shape=(1,))
-#     m = EmbeddingLayer(n_rests, n_factors)(restaurant)
-#     mb = EmbeddingLayer(n_rests, 1)(restaurant)   
-    
-#     x = Dot(axes=1)([u, m])
-#     x = Add()([x, ub, mb])
-#     x = Activation('sigmoid')(x)
-#     x = Lambda(lambda x: x * (max_rating - min_rating) + min_rating)(x)  
-    
-#     model = Model(inputs=[user, restaurant], outputs=x)
-#     opt = adam_v2.Adam(learning_rate=0.001)
-#     model.compile(loss='mean_squared_error', optimizer=opt)  
-    
-#     return model
+    class EmbeddingLayer:
+        def __init__(self, n_items, n_factors):
+            self.n_items = n_items
+            self.n_factors = n_factors
 
-# keras_model = Recommender(n_users, n_rests, n_factors, min_rating, max_rating)
-# keras_model.summary()
+        def __call__(self, x):
+            x = Embedding(self.n_items, self.n_factors,
+                          embeddings_initializer='he_normal', embeddings_regularizer=l2(1e-6))(x)
+            x = Reshape((self.n_factors,))(x)
 
-# keras_model.fit(x=X_train_array, y=y_train_keras, batch_size=64,\
-#                           epochs=5, verbose=1, validation_data=(X_test_array, y_test_keras))
+            return x
 
-# keras_model.save("./model/rss_model")
+    def Recommender(n_users, n_rests, n_factors, min_rating, max_rating):
+        user = Input(shape=(1,))
+        u = EmbeddingLayer(n_users, n_factors)(user)
+        ub = EmbeddingLayer(n_users, 1)(user)
 
-# # prediction
-# # predictions = keras_model.predict(X_test_array)
+        restaurant = Input(shape=(1,))
+        m = EmbeddingLayer(n_rests, n_factors)(restaurant)
+        mb = EmbeddingLayer(n_rests, 1)(restaurant)
 
-# import keras.models as keras_model
-# reconstructed_model = keras_model.load_model("./model/rss_model")
-# predictions = reconstructed_model.predict(X_test_array)
+        x = Dot(axes=1)([u, m])
+        x = Add()([x, ub, mb])
+        x = Activation('sigmoid')(x)
+        x = Lambda(lambda x: x * (max_rating - min_rating) + min_rating)(x)
 
-# # create the df_test table with prediction results
-# df_test = pd.DataFrame(X_test_keras[:,0])
-# df_test.rename(columns={0: "user"}, inplace=True)
-# df_test['business'] = X_test_keras[:,1]
-# df_test['stars'] = y_test_keras
-# df_test["predictions"] = predictions
-# print(df_test.head())
+        model = Model(inputs=[user, restaurant], outputs=x)
+        opt = adam_v2.Adam(learning_rate=0.001)
+        model.compile(loss='mean_squared_error', optimizer=opt)
 
-# # Plotting the distribution of actual and predicted stars
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# values, counts = np.unique(df_test['stars'], return_counts=True)
+        return model
 
-# plt.figure(figsize=(8,6))
-# plt.bar(values, counts, tick_label=['1','2','3','4','5'], label='true value')
-# plt.hist(predictions, color='orange', label='predicted value')
-# plt.xlabel("Ratings")
-# plt.ylabel("Frequency")
-# plt.title("Ratings Histogram")
-# plt.legend()
-# plt.show()
+    keras_model = Recommender(
+        n_users, n_rests, n_factors, min_rating, max_rating)
+    keras_model.summary()
 
-# # # plot 
-# # import matplotlib.pyplot as plt
-# # import seaborn as sns
+    keras_model.fit(x=X_train_array, y=y_train_keras, batch_size=64,
+                    epochs=5, verbose=1, validation_data=(X_test_array, y_test_keras))
 
-# # plt.figure(figsize=(15,6))
+    keras_model.save("./model/rss_model")
 
-# # ax1 = sns.distplot(df_test['stars'], hist=False, color="r", label="Actual Value")
-# # sns.distplot(predictions, hist=False, color="g", label="model2 Fitted Values" , ax=ax1)
+    # prediction
+    # predictions = keras_model.predict(X_test_array)
 
-# # plt.title('Actual vs Fitted Values for Restaurant Ratings')
-# # plt.xlabel('Stars')
-# # plt.ylabel('Proportion of Ratings')
+    import keras.models as keras_model
+    reconstructed_model = keras_model.load_model("./model/rss_model")
+    predictions = reconstructed_model.predict(X_test_array)
 
-# # plt.show()
-# # plt.close()
+    # create the df_test table with prediction results
+    df_test = pd.DataFrame(X_test_keras[:, 0])
+    df_test.rename(columns={0: "user"}, inplace=True)
+    df_test['business'] = X_test_keras[:, 1]
+    df_test['stars'] = y_test_keras
+    df_test["predictions"] = predictions
+    print(df_test.head())
 
-# # Extract embeddings
-# emb = reconstructed_model.get_layer('embedding_2')
-# emb_weights = emb.get_weights()[0]
+    # Plotting the distribution of actual and predicted stars
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    values, counts = np.unique(df_test['stars'], return_counts=True)
 
-# print("The shape of embedded weights: ", emb_weights.shape)
-# print("The length of embedded weights: ", len(emb_weights))
+    plt.figure(figsize=(8, 6))
+    plt.bar(values, counts, tick_label=[
+            '1', '2', '3', '4', '5'], label='true value')
+    plt.hist(predictions, color='orange', label='predicted value')
+    plt.xlabel("Ratings")
+    plt.ylabel("Frequency")
+    plt.title("Ratings Histogram")
+    plt.legend()
+    plt.show()
 
-# # Extract embeddings
-# # emb = keras_model.get_layer('embedding_2')
-# # emb_weights = emb.get_weights()[0]
+    # # plot
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
 
-# # print("The shape of embedded weights: ", emb_weights.shape)
-# # print("The length of embedded weights: ", len(emb_weights))
+    # plt.figure(figsize=(15,6))
 
-# # normalize and reshape embedded weights
-# emb_weights = emb_weights / np.linalg.norm(emb_weights, axis = 1).reshape((-1, 1))
-# len(emb_weights)
+    # ax1 = sns.distplot(df_test['stars'], hist=False, color="r", label="Actual Value")
+    # sns.distplot(predictions, hist=False, color="g", label="model2 Fitted Values" , ax=ax1)
 
-# # get all unique business_ids (restaurants)
-# rest_id_emb = combined_business_data_keras["business_id"].unique()
-# len(rest_id_emb)
-# # rest_id_emb
+    # plt.title('Actual vs Fitted Values for Restaurant Ratings')
+    # plt.xlabel('Stars')
+    # plt.ylabel('Proportion of Ratings')
 
-# rest_pd = pd.DataFrame(emb_weights)
-# # rest_pd
-# rest_pd["business_id"] = rest_id_emb
-# rest_pd = rest_pd.set_index("business_id")
-# rest_pd
+    # plt.show()
+    # plt.close()
 
-# # merging rest_pd and temp tables to get the name of the restaurants.
-# temp = combined_business_data_keras[['business_id', 'name']].drop_duplicates()
-# df_recommend = pd.merge(rest_pd, temp, on='business_id')
-# df_recommend
+    # Extract embeddings
+    emb = reconstructed_model.get_layer('embedding_2')
+    emb_weights = emb.get_weights()[0]
 
-# # exrtract the target restaurant from the df_recommend table
-# target = df_recommend[df_recommend['name'] == 'Village Whiskey']
-# target.iloc[:,1:51]
+    print("The shape of embedded weights: ", emb_weights.shape)
+    print("The length of embedded weights: ", len(emb_weights))
 
-# def find_similarity_total(rest_name):
-#     """Recommends restaurant based on the cosine similarity between restaurants"""
-#     cosine_list_total = []
-#     result = []
+    # Extract embeddings
+    # emb = keras_model.get_layer('embedding_2')
+    # emb_weights = emb.get_weights()[0]
 
-#     for i in range(0, df_recommend.shape[0]):
-#         sample_name = df_recommend[df_recommend["name"] == rest_name].iloc[:,1:51]
-#         row = df_recommend.iloc[i,1:51]
-#         cosine_total = np.dot(sample_name, row)
-        
-#         recommended_name = df_recommend.iloc[i,51]
-#         cosine_list_total.append(cosine_total)
-#         result.append(recommended_name)
-        
-#     cosine_df_total = pd.DataFrame({"similar_rest" : result, "cosine" : cosine_list_total})
+    # print("The shape of embedded weights: ", emb_weights.shape)
+    # print("The length of embedded weights: ", len(emb_weights))
 
-#     return cosine_df_total
+    # normalize and reshape embedded weights
+    emb_weights = emb_weights / \
+        np.linalg.norm(emb_weights, axis=1).reshape((-1, 1))
+    len(emb_weights)
 
-# # call the function with input of "Wvrst" and store it in result variable.
-# result = find_similarity_total('Village Whiskey')
+    # get all unique business_ids (restaurants)
+    rest_id_emb = combined_business_data_keras["business_id"].unique()
+    len(rest_id_emb)
+    # rest_id_emb
 
+    rest_pd = pd.DataFrame(emb_weights)
+    # rest_pd
+    rest_pd["business_id"] = rest_id_emb
+    rest_pd = rest_pd.set_index("business_id")
+    rest_pd
 
-# # head of result table
-# print(result.head())
+    # merging rest_pd and temp tables to get the name of the restaurants.
+    temp = combined_business_data_keras[[
+        'business_id', 'name']].drop_duplicates()
+    df_recommend = pd.merge(rest_pd, temp, on='business_id')
+    df_recommend
 
-# '''
-# - function that replace '[]' to empty str 
-# - convert string to float
-# '''
-# def convert(input):
-#     return float(str(input).replace('[','').replace(']',''))
+    # exrtract the target restaurant from the df_recommend table
+    target = df_recommend[df_recommend['name'] == 'Village Whiskey']
+    target.iloc[:, 1:51]
 
-# # create new column called "cos" in result table
-# result['cos'] = result.apply(lambda x: convert(x['cosine']), axis=1)
+    def find_similarity_total(rest_name):
+        """Recommends restaurant based on the cosine similarity between restaurants"""
+        cosine_list_total = []
+        result = []
 
-# # drop original 'cosine' column (which had values with np.array)
-# result.drop('cosine', axis=1, inplace=True)
+        for i in range(0, df_recommend.shape[0]):
+            sample_name = df_recommend[df_recommend["name"]
+                                       == rest_name].iloc[:, 1:51]
+            row = df_recommend.iloc[i, 1:51]
+            cosine_total = np.dot(sample_name, row)
 
-# # sort values with cos
-# print(result.sort_values('cos', ascending=False).head(10))
+            recommended_name = df_recommend.iloc[i, 51]
+            cosine_list_total.append(cosine_total)
+            result.append(recommended_name)
+
+        cosine_df_total = pd.DataFrame(
+            {"similar_rest": result, "cosine": cosine_list_total})
+
+        return cosine_df_total
+
+    # call the function with input of "Wvrst" and store it in result variable.
+    result = find_similarity_total('Village Whiskey')
+
+    # head of result table
+    print(result.head())
+
+    '''
+    - function that replace '[]' to empty str 
+    - convert string to float
+    '''
+    def convert(input):
+        return float(str(input).replace('[', '').replace(']', ''))
+
+    # create new column called "cos" in result table
+    result['cos'] = result.apply(lambda x: convert(x['cosine']), axis=1)
+
+    # drop original 'cosine' column (which had values with np.array)
+    result.drop('cosine', axis=1, inplace=True)
+
+    # sort values with cos
+    print(result.sort_values('cos', ascending=False).head(10))

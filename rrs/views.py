@@ -4,7 +4,7 @@ from rrs.colab.ml3 import run
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return render(request, 'rrs/main.html')
 
 
 def model(request):
