@@ -7,7 +7,7 @@ from keras.layers import Add, Activation, Lambda
 import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils import prettyPrint as pp
+from rrs.colab.utils import prettyPrint as pp
 import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 import warnings
@@ -314,21 +314,9 @@ def contentBasedFiltering():
     print(result[['distance', 'index', 'name', 'stars']].head(5))
 
 
-############### 2) Collaboritive Filtering - Model ##################
-def collaborititveFiltering():
-    # Imports
-    import sklearn
-    from sklearn.decomposition import TruncatedSVD
-    from sklearn.metrics import accuracy_score
-    from utils import prettyPrint as pp
-
-    # Globals
-    global combined_business_data, rest, subset_review
-
-    # looking at the columns of subset_review table
-    # subset_review.columns
-
-    # pull out needed columns from subset_review table
+def genKerasData():
+    global combined_business_data, subset_review, rest
+# pull out needed columns from subset_review table
     df_review = subset_review[['user_id', 'business_id', 'stars', 'date']]
     # df_review
 
@@ -340,6 +328,21 @@ def collaborititveFiltering():
     combined_business_data = pd.merge(df_review, restaurant, on='business_id')
     # combined_business_data
 
+############### 2) Collaboritive Filtering - Model ##################
+
+
+def collaborititveFiltering():
+    # Imports
+    import sklearn
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.metrics import accuracy_score
+
+    # Globals
+    global combined_business_data, rest, subset_review
+
+    # looking at the columns of subset_review table
+    # subset_review.columns
+    genKerasData()
     # the most POPULAR restaurants by stars.
     pp("collaborititveFiltering: Most popular restaurants by stars")
     print(combined_business_data.groupby('business_id')[
@@ -627,7 +630,7 @@ def convert(input):
     return float(str(input).replace('[', '').replace(']', ''))
 
 
-def kerasModel():
+def kerasModel(rest_name, n):
     n_users, n_rests, n_factors, min_rating, max_rating = dataLabelEncoder(
         combined_business_data)
     X_train_array, X_test_array = trainTestSplit(combined_business_data_keras)
@@ -640,7 +643,7 @@ def kerasModel():
     df_test = predResultTable(predictions)
     plotPredResults(predictions, df_test)
     df_recommend = prepareForRecommedation(reconstructed_model)
-    result = find_similarity_total('Village Whiskey', df_recommend)
+    result = find_similarity_total(rest_name, df_recommend)
     # create new column called "cos" in result table
     result['cos'] = result.apply(lambda x: convert(x['cosine']), axis=1)
 
@@ -648,14 +651,14 @@ def kerasModel():
     result.drop('cosine', axis=1, inplace=True)
 
     # sort values with cos
-    print(result.sort_values('cos', ascending=False).head(10))
+    res = result.sort_values('cos', ascending=False).head(n)
+    return res["similar_rest"]
 
 
-def run():
+def run(rest_name, n):
     dataPreprocessing()
-    contentBasedFiltering()
-    collaborititveFiltering()
-    kerasModel()
-
-
-run()
+    genKerasData()
+    # contentBasedFiltering()
+    # collaborititveFiltering()
+    result = kerasModel(rest_name, n)
+    return result
