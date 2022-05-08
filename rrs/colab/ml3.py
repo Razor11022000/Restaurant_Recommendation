@@ -4,10 +4,10 @@ from keras.layers.embeddings import Embedding
 from keras.layers import Input, Reshape, Dot
 from keras.models import Model
 from keras.layers import Add, Activation, Lambda
+from rrs.colab.utils import prettyPrint as pp
 import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
-from rrs.colab.utils import prettyPrint as pp
 import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 import warnings
@@ -180,7 +180,6 @@ def createAttrsTable(rest):
                             pd.Series), rest['GoodForMeal'].apply(pd.Series),
                         rest['Dietary'].apply(pd.Series)], axis=1)
     df_attr_dummies = pd.get_dummies(df_attr)
-    print()
     return df_attr_dummies
 
 
@@ -661,4 +660,8 @@ def run(rest_name, n):
     # contentBasedFiltering()
     # collaborititveFiltering()
     result = kerasModel(rest_name, n)
+    # print(result)
     return result
+
+
+# run('Village Whiskey', 10)
