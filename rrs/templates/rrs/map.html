@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_af8a0b8c21ae772621d6fbd2f2e19418 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_af8a0b8c21ae772621d6fbd2f2e19418" ></div>
+        
+</body>
+<script>    
+    
+            var map_af8a0b8c21ae772621d6fbd2f2e19418 = L.map(
+                "map_af8a0b8c21ae772621d6fbd2f2e19418",
+                {
+                    center: [29.960978900000004, -90.07152390000002],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 11,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_33d3b591d78cbb717686e5a75ac601c6 = L.tileLayer(
+                "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var marker_8cdb3d83beaab5659c9fc11633b2120a = L.marker(
+                [29.9686422, -90.0679433],
+                {}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var icon_52e51492831beec5b3768e3a2d4164bb = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "cutlery", "iconColor": "white", "markerColor": "darkred", "prefix": "fa"}
+            );
+            marker_8cdb3d83beaab5659c9fc11633b2120a.setIcon(icon_52e51492831beec5b3768e3a2d4164bb);
+        
+    
+        var popup_0203c3f8e73f9ad960c767ae1e4eda17 = L.popup({"maxWidth": 300});
+
+        
+            var html_d89a8ccb959782f5c76666b99ccd820e = $(`<div id="html_d89a8ccb959782f5c76666b99ccd820e" style="width: 100.0%; height: 100.0%;"><a target="_blank" href="http://www.google.com/search?q=toronto+Li'l+Dizzy's+Cafe">Li'l Dizzy's Cafe</a><br></div>`)[0];
+            popup_0203c3f8e73f9ad960c767ae1e4eda17.setContent(html_d89a8ccb959782f5c76666b99ccd820e);
+        
+
+        marker_8cdb3d83beaab5659c9fc11633b2120a.bindPopup(popup_0203c3f8e73f9ad960c767ae1e4eda17)
+        ;
+
+        
+    
+    
+            var marker_1395fe4e0ed818d7d16962e0ff509e50 = L.marker(
+                [29.9733253, -90.0810244],
+                {}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var icon_ad6233e4c99458f60d1b5c0a1e6a9c2a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "cutlery", "iconColor": "white", "markerColor": "darkred", "prefix": "fa"}
+            );
+            marker_1395fe4e0ed818d7d16962e0ff509e50.setIcon(icon_ad6233e4c99458f60d1b5c0a1e6a9c2a);
+        
+    
+        var popup_a8ade2ed253e332b3c6fa98aec495d16 = L.popup({"maxWidth": 300});
+
+        
+            var html_1560fae2fd90be4bd3bf7d0f4ef902dd = $(`<div id="html_1560fae2fd90be4bd3bf7d0f4ef902dd" style="width: 100.0%; height: 100.0%;"><a target="_blank" href="http://www.google.com/search?q=toronto+Crescent+City+Steak+House">Crescent City Steak House</a><br></div>`)[0];
+            popup_a8ade2ed253e332b3c6fa98aec495d16.setContent(html_1560fae2fd90be4bd3bf7d0f4ef902dd);
+        
+
+        marker_1395fe4e0ed818d7d16962e0ff509e50.bindPopup(popup_a8ade2ed253e332b3c6fa98aec495d16)
+        ;
+
+        
+    
+    
+            var marker_735f4c3fc5517c5f132ba2c9bc2818a7 = L.marker(
+                [29.9517074, -90.0801852],
+                {}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var icon_9121268669198f17dbd7ce69e7099d58 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "cutlery", "iconColor": "white", "markerColor": "darkred", "prefix": "fa"}
+            );
+            marker_735f4c3fc5517c5f132ba2c9bc2818a7.setIcon(icon_9121268669198f17dbd7ce69e7099d58);
+        
+    
+        var popup_14050de00fba6e300a76d5494058f8c3 = L.popup({"maxWidth": 300});
+
+        
+            var html_5f16baf67f59c2be02618dc328fe7739 = $(`<div id="html_5f16baf67f59c2be02618dc328fe7739" style="width: 100.0%; height: 100.0%;"><a target="_blank" href="http://www.google.com/search?q=toronto+Cookies+&+Cocktails">Cookies & Cocktails</a><br></div>`)[0];
+            popup_14050de00fba6e300a76d5494058f8c3.setContent(html_5f16baf67f59c2be02618dc328fe7739);
+        
+
+        marker_735f4c3fc5517c5f132ba2c9bc2818a7.bindPopup(popup_14050de00fba6e300a76d5494058f8c3)
+        ;
+
+        
+    
+    
+            var marker_b790af91039aab0daae0611e503dd103 = L.marker(
+                [29.9452593, -90.0906756],
+                {}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var icon_0984decd9e7001e3adaefdf06fbb7f33 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "cutlery", "iconColor": "white", "markerColor": "darkred", "prefix": "fa"}
+            );
+            marker_b790af91039aab0daae0611e503dd103.setIcon(icon_0984decd9e7001e3adaefdf06fbb7f33);
+        
+    
+        var popup_43adebf57bb38f2f9adb0b25b2349489 = L.popup({"maxWidth": 300});
+
+        
+            var html_66940b1e9638378ec3fcb6693b67ca1b = $(`<div id="html_66940b1e9638378ec3fcb6693b67ca1b" style="width: 100.0%; height: 100.0%;"><a target="_blank" href="http://www.google.com/search?q=toronto+Rally's">Rally's</a><br></div>`)[0];
+            popup_43adebf57bb38f2f9adb0b25b2349489.setContent(html_66940b1e9638378ec3fcb6693b67ca1b);
+        
+
+        marker_b790af91039aab0daae0611e503dd103.bindPopup(popup_43adebf57bb38f2f9adb0b25b2349489)
+        ;
+
+        
+    
+    
+            var marker_c8e3722ff2d84c26edf97f895d26e02b = L.marker(
+                [29.9659603, -90.037791],
+                {}
+            ).addTo(map_af8a0b8c21ae772621d6fbd2f2e19418);
+        
+    
+            var icon_cc5d1684fb6ba6ea16aeea825e3887bd = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "cutlery", "iconColor": "white", "markerColor": "darkred", "prefix": "fa"}
+            );
+            marker_c8e3722ff2d84c26edf97f895d26e02b.setIcon(icon_cc5d1684fb6ba6ea16aeea825e3887bd);
+        
+    
+        var popup_f131d049984c221c8683b5ad970bc3ee = L.popup({"maxWidth": 300});
+
+        
+            var html_4d1e63f3e0d71225c3be2752195221ff = $(`<div id="html_4d1e63f3e0d71225c3be2752195221ff" style="width: 100.0%; height: 100.0%;"><a target="_blank" href="http://www.google.com/search?q=toronto+Garage+Pizza">Garage Pizza</a><br></div>`)[0];
+            popup_f131d049984c221c8683b5ad970bc3ee.setContent(html_4d1e63f3e0d71225c3be2752195221ff);
+        
+
+        marker_c8e3722ff2d84c26edf97f895d26e02b.bindPopup(popup_f131d049984c221c8683b5ad970bc3ee)
+        ;
+
+        
+    
+</script>

@@ -1,57 +1,72 @@
-from django.http import HttpResponse
 from django.shortcuts import render
-import pandas as pd
-from rrs.colab.cnbf import content_based_filtering
-from rrs.colab.ml3 import collaborititveFiltering
-from rrs.colab.utils import prettyPrint as pp
-from rrs.colab.datapreprocessing import data_preprocessing
-df_final = pd.DataFrame()
-################## LOAD DATASET #####################
-pp("Loading Dataset")
-# Define path for dataset
-business_data_path = "C:/Users/Midhun/Downloads/yelp_academic_dataset_business.json"
-reviews_data_path = "C:/Users/Midhun/Downloads/yelp_academic_dataset_review.json"
-
-# import the data (chunksize returns jsonReader for iteration)
-businesses = pd.read_json(business_data_path, lines=True,
-                          orient='columns', chunksize=1000000)
-reviews = pd.read_json(reviews_data_path, lines=True,
-                       orient='columns', chunksize=1000000)
-
-for business in businesses:
-    df_business = business
-    break
-
-for review in reviews:
-    df_review = review
-    break
-pp("Dataset Loaded")
-print(df_business.head())
-print(df_review.head())
-################## END LOAD DATASET #####################
-
-
-################## DATA PREPROCESSING #####################
-
-
-################## VIEW METHODS #####################
+from rrs.utils import prettyPrint as pp
+from rrs.recommedation_pojo import Recommedation
+from rrs.restaurant_recommender import Restaurant_Recommender
+from rrs.tf_idf import TF_IDF
+from .forms import NameForm
 
 
 def index(request):
-    global df_final
-    pp("Started Datapreprocessing")
-    if len(df_final.index) == 0:
-        df_final = data_preprocessing(df_business)
-        pp("Datapreprocessing Successful")
-    return render(request, 'rrs/main.html')
+    pp("index called")
+    context = {}
+    form = NameForm()
+    recommondationsNotAvail = False
+
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            form_sentence = form.cleaned_data["sentence"]
+            form_cuisine = form.cleaned_data["cuisine"]
+            form_city = form.cleaned_data["city"]
+            model = TF_IDF(form_city)
+            topNRecommendations = model.produce_recommendations(
+                form_sentence, 10)
+            pp(form_sentence)
+            pp(form_cuisine)
+            if form_cuisine == "none":
+                # a list of restaurant objects
+                context = {"topNRecommendations": topNRecommendations}
+            else:
+                recommedations = cusine_process(
+                    topNRecommendations, form_cuisine)
+                if recommedations == []:
+                    recommondationsNotAvail = True
+                context = {"topNRecommendations": recommedations}
+
+            context['range'] = range(5)
+            context['recommondationsNotAvail'] = recommondationsNotAvail
+            form = NameForm()
+
+    context['form'] = form
+
+    return render(request, 'rrs/main.html', context)
+
+
+def cusine_process(topNRecommendations, cuisine):
+    recomm = []
+    pp("Cuisine_process id called")
+    pp(cuisine)
+    # Select each object from the recommendation list
+    for topr in topNRecommendations:
+        # select the category
+        for cat in topr.cuisine:
+            if cuisine == cat:
+                recomm.append(topr)
+    print(recomm)
+    return recomm
 
 
 def model(request):
     print("rss/model running.....")
-    # post
-    # result = run('Village Whiskey', 10)
-    cnbf_result = content_based_filtering(df_final)
-    print(cnbf_result)
-    # cnbf_result = collaborititve_filtering()
-    # context = {'result': cnbf_result}
+
     return render(request, 'rrs/model.html', context={})
+
+
+def map(request, city, rest_name):
+    print("map loading.....")
+    print(rest_name)
+    recom = Restaurant_Recommender(city)
+    recom.train_test_split()
+    recom.get_recommendations(rest_name)
+    return render(request, 'rrs/map.html', context={})
