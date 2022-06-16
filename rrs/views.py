@@ -1,9 +1,13 @@
+import base64
 from django.shortcuts import render
+from matplotlib.style import context
+from Restuarant_Recommendation.settings import PLOTS_ROOT
 from rrs.utils import prettyPrint as pp
 from rrs.recommedation_pojo import Recommedation
 from rrs.restaurant_recommender import Restaurant_Recommender
 from rrs.tf_idf import TF_IDF
 from .forms import NameForm
+import urllib
 
 
 def index(request):
@@ -40,7 +44,7 @@ def index(request):
 
     context['form'] = form
 
-    return render(request, 'rrs/main.html', context)
+    return render(request, 'rrs/pricing.html', context)
 
 
 def cusine_process(topNRecommendations, cuisine):
@@ -70,3 +74,19 @@ def map(request, city, rest_name):
     recom.train_test_split()
     recom.get_recommendations(rest_name)
     return render(request, 'rrs/map.html', context={})
+
+
+def model_performance(request):
+    context = {}
+    actual_vs_predicted = get_plot("actual_vs_predicted")
+    context["actual_vs_predicted"] = actual_vs_predicted
+    return render(request, 'rrs/model_performance.html', context)
+
+
+def get_plot(filename):
+    CWD = "C:/Users/Midhun/Desktop/FYP/Restuarant_Recommendation/rrs/plots/"
+    plot_path = CWD + filename + ".png"
+    with open(plot_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    uri = urllib.parse.quote(encoded_string)
+    return uri

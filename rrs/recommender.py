@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import pandas as pd
+from Restuarant_Recommendation.settings import PLOTS_ROOT
 from numba import jit
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -70,7 +72,6 @@ class Recommender():
     '''Class to hold a FunkSVD fitted recommender and associated information.  
     Predicts ratings based on interactions between generic 'users' and 'items'
     'items' could be, e.g., movies, restaurants, articles etc.
-    See: https://en.wikipedia.org/wiki/Matrix_factorization_(recommender_systems)#Funk_MF
     N.B. Currently only integer ratings allowed
 
     Args:
@@ -228,8 +229,14 @@ class Recommender():
 
         # Plots heatmap if required
         if plot:
+            CWD = "C:/Users/Midhun/Desktop/FYP/Restuarant_Recommendation/rrs/plots/"
+
             fig, ax = plt.subplots(1, 2, figsize=(12, 4))
             sns.heatmap(confusion_array, annot=True, fmt='.0f', ax=ax[0])
+
+            # path = os.path.join(CWD, "heatmap.png")
+            # plt.savefig(path, bbox_inches='tight')
+
             ax[0].set_xticks(
                 np.arange(self.min_rating, self.max_rating+1, 1)-0.5)
             ax[0].set_xticklabels(
@@ -268,7 +275,8 @@ class Recommender():
 
             fig.suptitle('Predicted vs. Actual Ratings Distributions', y=1.1)
 
-        return confusion_array, SSE
+            path = os.path.join(CWD, "actual_vs_predicted.png")
+            plt.savefig(path, bbox_inches='tight')
 
     def predict_ratings_for_user(self, user_id, num_recs=-1):
         '''For a given user_id, returns a given number of recommendations
@@ -293,7 +301,7 @@ class Recommender():
 
         return predictions
 
-    def get_item_names(self, df_item, item_series, item_name_col, other_cols=[]):
+    def get_item_names(self, df_item, item_series, business_id, item_name_col, other_cols=[]):
         ''' For a given set of item ids, get their names from df_item, a
             dataframe containing the item_id column (defined in the 
             set_user_item_matrix method) and an item_name column, defined
@@ -315,9 +323,16 @@ class Recommender():
         recomms_df = pd.DataFrame(item_series) \
             .merge(df_item, on=self.item_id_col_name)[[self.item_id_col_name, item_name_col, *other_cols]]  # Unpack other_cols into the slice
 
-        return recomms_df
+        rest_df = df_item[df_item['business_id'] == business_id]
+        rest_df["similarity"] = 1.000
+        rest_df = rest_df[["business_id", "name", 'similarity',
+                           'latitude', 'longitude', 'review_count']]
 
-    def plot_locations(self, recomms_df, item_name_col, latitude_name, longitude_name, info=None, search_string='', icon='cutlery'):
+        recomms_df2 = pd.concat([recomms_df, rest_df], axis=0).reset_index()
+        recomms_df2 = recomms_df2.drop("index", axis=1)
+        return recomms_df2
+
+    def plot_locations(self, recomms_df, business_id, item_name_col, latitude_name, longitude_name, info=None, search_string='', icon='cutlery'):
         '''Cluster plot the locations on a Folium map
         Args:
             recomms_df       - (pd.DataFrame) ideally output of self.get_item_names
@@ -371,7 +386,8 @@ class Recommender():
 
                     popup_string = '\n' + \
                         info.replace('_', ' ').title() + ': ' + pop_num
-
+                elif row["business_id"] == business_id:
+                    color = 'blue'
                 else:
                     popup_string = ''
                     color = 'darkred'
@@ -428,6 +444,7 @@ class Recommender():
                          .sort_values(ascending=False)[1:n] \
                          .rename('similarity')
 
+        print(similarities)
         return similarities
 
 
