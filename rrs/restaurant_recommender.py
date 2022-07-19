@@ -50,12 +50,12 @@ class Restaurant_Recommender:
 
         rec.compare_train_to_predictions(self.toronto_reviews_test)
 
-        out = rec.get_similar_items(rest_id.iloc[0], 5)
+        out = rec.get_similar_items(rest_id.iloc[0], 10)
 
         recoms = rec.get_item_names(self.df_businesses_toronto, out, rest_id.iloc[0], 'name', [
                                     'similarity', 'latitude', 'longitude', 'review_count'])
         map = rec.plot_locations(
-            recoms, rest_id.iloc[0], 'name', 'latitude', 'longitude', info=None, search_string=self.city)
+            recoms, rest_id.iloc[0], 'name', 'latitude', 'longitude', info='similarity', search_string=self.city)
 
         CWD = "C:/Users/Midhun/Desktop/FYP/Restuarant_Recommendation/rrs/templates/rrs/"
         path = os.path.join(CWD, "map.html")

@@ -6,4 +6,4 @@ class NameForm(forms.Form):
     cuisine = forms.ChoiceField(
         choices=[('Mexican', 'Mexican'), ('Indian', 'Indian'), ('Bars', 'Bars'), ('American (New)', 'American (New)'), ('Italian', 'Italian'), ('none', 'none')])
     city = forms.ChoiceField(
-        choices=[('Philadelphia', 'Philadelphia'), ('Nashville', 'Nashville'), ('New Orleans', 'New Orleans'), ('Tuscon', 'Tuscon'), ('Edmonton', 'Edmonton')])
+        choices=[('Philadelphia', 'Philadelphia'), ('Nashville', 'Nashville'), ('New Orleans', 'New Orleans')])

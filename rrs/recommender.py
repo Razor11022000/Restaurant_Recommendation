@@ -386,11 +386,12 @@ class Recommender():
 
                     popup_string = '\n' + \
                         info.replace('_', ' ').title() + ': ' + pop_num
-                elif row["business_id"] == business_id:
-                    color = 'blue'
                 else:
                     popup_string = ''
                     color = 'darkred'
+
+                if row["business_id"] == business_id:
+                    color = 'blue'
 
                 popup = folium.Popup(search_string + row[item_name_col].replace(' ', '+')+'">'
                                      + row[item_name_col]+'</a><br>'+popup_string, max_width=300)
